@@ -1,9 +1,9 @@
-require("dotenv").config();
+const { PORT } = require("./config/env");
 
 const app = require("./app");
 
-const PORT = process.env.PORT || 3001;
+const activePort = PORT || 3001;
 
-app.listen(PORT, () => {
-  console.log(`FlowForge API running at http://localhost:${PORT}`);
+app.listen(activePort, () => {
+  console.log(`FlowForge API running at http://localhost:${activePort}`);
 });

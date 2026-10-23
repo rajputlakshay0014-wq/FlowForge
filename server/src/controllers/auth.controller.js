@@ -15,14 +15,15 @@ async function signup(req, res) {
       ...(token ? { token } : {}),
     });
   } catch (error) {
-    const statusCode = error.statusCode || 500;
+    const isDuplicate = error.statusCode === 409 || error.code === "P2002" || error.code === "EMAIL_ALREADY_EXISTS";
+    const statusCode = isDuplicate ? 409 : (error.statusCode || 500);
 
     return res.status(statusCode).json({
       error: {
         code:
           statusCode === 400
-            ? "VALIDATION_ERROR"
-            : statusCode === 409
+            ? (error.code || "VALIDATION_ERROR")
+            : isDuplicate
               ? "EMAIL_ALREADY_EXISTS"
               : "INTERNAL_SERVER_ERROR",
         message:
@@ -49,9 +50,9 @@ async function login(req, res) {
       error: {
         code:
           statusCode === 400
-            ? "VALIDATION_ERROR"
+            ? (error.code || "VALIDATION_ERROR")
             : statusCode === 401
-              ? "INVALID_CREDENTIALS"
+              ? (error.code || "INVALID_CREDENTIALS")
               : "INTERNAL_SERVER_ERROR",
         message:
           statusCode >= 500
@@ -62,4 +63,33 @@ async function login(req, res) {
   }
 }
 
-module.exports = { signup, login };
+async function getMe(req, res) {
+  try {
+    const user = await authService.getCurrentUser(req.user?.id);
+
+    return res.status(200).json({
+      message: "Authenticated successfully",
+      userId: user.id,
+      user,
+    });
+  } catch (error) {
+    const statusCode = error.statusCode || 500;
+
+    return res.status(statusCode).json({
+      error: {
+        code:
+          statusCode === 401
+            ? "UNAUTHORIZED"
+            : statusCode === 404
+              ? "NOT_FOUND"
+              : "INTERNAL_SERVER_ERROR",
+        message:
+          statusCode >= 500
+            ? "Something went wrong"
+            : error.message,
+      },
+    });
+  }
+}
+
+module.exports = { signup, login, getMe };

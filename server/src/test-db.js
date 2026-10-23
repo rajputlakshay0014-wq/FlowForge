@@ -1,5 +1,5 @@
 
-require("dotenv").config();
+require("./config/env");
 
 const prisma = require("./lib/prisma");
 
