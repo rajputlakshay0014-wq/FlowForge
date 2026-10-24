@@ -1,38 +1,26 @@
 # FlowForge — Team Collaboration & Project Management
 
-FlowForge is a full-stack project management application designed to help teams organize projects and manage tasks in one place.
+FlowForge is a full-stack web application for organizing projects and managing tasks through a centralized dashboard.
+
+**GitHub Repository:** [FlowForge](https://github.com/rajputlakshay0014-wq/FlowForge)
 
 ## Features
 
-- User authentication
-- Create, view, update, and delete projects
-- Create and manage tasks
-- Task status and priority tracking
-- Search, filtering, and pagination
-- Dashboard with project and task summaries
+- User registration and login with JWT authentication
+- Create, update, view, and delete projects
+- Create and manage project tasks
+- Track task status and priority
+- Backend validation and user-level authorization
+- Dashboard for managing projects and tasks
 
 ## Tech Stack
 
-**Frontend**
-- React
-- Vite
-- JavaScript
-- CSS
-
-**Backend**
-- Node.js
-- Express.js
-- PostgreSQL
-- Prisma ORM
-
-## Project Structure
-
-```text
-FlowForge/
-├── client/     # React frontend
-├── server/     # Express backend and Prisma
-└── README.md
-```
+- **Frontend:** React, Vite, JavaScript, CSS
+- **Backend:** Node.js, Express.js
+- **Database:** PostgreSQL
+- **ORM:** Prisma
+- **Authentication:** JWT
+- **Validation:** Zod
 
 ## Getting Started
 
@@ -50,32 +38,46 @@ npm install --prefix client
 npm install --prefix server
 ```
 
-### 3. Configure environment variables
+### 3. Configure the environment
 
-Create `server/.env` using your local database configuration and the environment variables required by the backend. Never commit `.env` or share database credentials.
+Create `server/.env` with the database connection and authentication settings required by the backend. Make sure PostgreSQL is available and the database is initialized according to the project's Prisma setup.
 
-### 4. Start the backend
+**Never commit your `.env` file or expose credentials.**
 
-```bash
-cd server
-npm run dev
-```
-
-### 5. Start the frontend
-
-Open another terminal:
+### 4. Run the backend
 
 ```bash
-cd FlowForge/client
-npm run dev
+npm run dev --prefix server
 ```
 
-Open the local URL displayed by Vite in your browser.
+### 5. Run the frontend
 
-## Project Status
+Open a second terminal in the project root:
 
-The initial full-stack implementation is available. Further testing and deployment are ongoing.
+```bash
+npm run dev --prefix client
+```
+
+Open the local URL displayed by Vite.
+
+## Testing
+
+Run backend tests:
+
+```bash
+npm test --prefix server
+```
+
+Build the frontend:
+
+```bash
+npm run build --prefix client
+```
+
+**Latest verified results:** 40 backend tests passed; frontend production build successful.
 
 ## Author
 
-Lakshay Pratap Singh
+**Lakshay Pratap Singh**
+
+[GitHub Profile](https://github.com/rajputlakshay0014-wq)

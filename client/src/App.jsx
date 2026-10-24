@@ -100,6 +100,8 @@ function App() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [backendStatus, setBackendStatus] = useState("Checking");
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [topProfileMenuOpen, setTopProfileMenuOpen] = useState(false);
 
   const clearMessages = () => {
     setError("");
@@ -129,6 +131,8 @@ function App() {
     setTasks([]);
     setActiveView("Dashboard");
     setPassword("");
+    setProfileMenuOpen(false);
+    setTopProfileMenuOpen(false);
     clearMessages();
   }, []);
 
@@ -521,6 +525,20 @@ function App() {
   return (
     <div className="workspace">
       <style>{`
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; width: 100%; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; text-align: left; }
+        .sidebar-brand:focus-visible { outline: 2px solid #43b4ff; outline-offset: 4px; border-radius: 8px; }
+        .profile-area { position: relative; }
+        .topbar-right { position: relative; }
+        .top-profile-menu { position: absolute; top: calc(100% + 12px); right: 0; z-index: 40; min-width: 180px; max-width: 260px; padding: 10px 14px; border: 1px solid #2b3b53; border-radius: 12px; background: #152237; box-shadow: 0 14px 36px #0005; }
+        .profile { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }\n        .profile:hover { background: #18263a; }\n        .profile:focus-visible { outline: 2px solid #43b4ff; outline-offset: 2px; }
+        .profile-menu { position: absolute; left: 0; right: 0; bottom: calc(100% + 10px); z-index: 30; padding: 14px; border: 1px solid #2b3b53; border-radius: 12px; background: #152237; box-shadow: 0 14px 36px #0005; }
+        .profile-menu-name { margin: 0 0 5px; color: #edf4ff; font-weight: 700; overflow-wrap: anywhere; }
+        .profile-menu-email { margin: 0 0 12px; color: #9aacc5; font-size: 12px; overflow-wrap: anywhere; }
+        .profile-menu-label { display: block; margin-bottom: 5px; color: #7f91ab; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+        .profile-menu-logout { width: 100%; padding: 9px 11px; border: 1px solid #3a4c65; border-radius: 9px; background: #1b2a40; color: #e9f1ff; cursor: pointer; text-align: left; }
+        .profile-menu-logout:hover { border-color: #43b4ff; background: #223752; }
+        .task-title-cell > div { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; min-width: 0; }
+        .task-description { display: block; margin-top: 2px; line-height: 1.45; overflow-wrap: anywhere; }
         .task-controls { margin: 26px 0 20px; }
         .task-toolbar { display: grid; grid-template-columns: minmax(280px, 1.8fr) repeat(4, minmax(125px, 1fr)) auto; gap: 10px; align-items: center; }
         .task-search-wrap { min-width: 0; display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 15px; border: 1px solid #344660; border-radius: 13px; background: #111d30; color: #9aacc5; transition: border-color .2s, box-shadow .2s; }
@@ -553,7 +571,7 @@ function App() {
         @media (max-width: 700px) { .task-toolbar { grid-template-columns: 1fr 1fr; } .task-search-wrap { grid-column: 1 / -1; } .refresh-button { width: 100%; } .pagination-bar { align-items: flex-start; } .pagination-controls { flex-wrap: wrap; } .filter-result-count { width: 100%; margin-left: 0; } }
       `}</style>
       <aside className="sidebar">
-        <div className="sidebar-brand"><span className="brand-mark small-mark">F</span><span>FlowForge</span></div>
+        <button type="button" className="sidebar-brand" onClick={() => setActiveView("Dashboard")} aria-label="Go to dashboard"><span className="brand-mark small-mark">F</span><span>FlowForge</span></button>
         <p className="nav-label">WORKSPACE</p>
         <nav className="main-nav">
           {[["Dashboard", "▦"], ["Projects", "▤"], ["Tasks", "✓"]].map(([view, symbol]) => (
@@ -565,10 +583,26 @@ function App() {
         </nav>
         <div className="sidebar-bottom">
           <div className="api-indicator"><span className={`status-dot ${backendStatus === "Online" ? "online" : ""}`} />API {backendStatus}</div>
-          <div className="profile">
-            <div className="avatar">{(user?.name || user?.email || "U").charAt(0).toUpperCase()}</div>
-            <div className="profile-text"><strong>{user?.name || "Your workspace"}</strong><span>{user?.email || email || "Signed in"}</span></div>
-            <button className="logout-button" onClick={logout} title="Sign out">↪</button>
+          <div className="profile-area">
+            {profileMenuOpen && (
+              <div className="profile-menu" role="region" aria-label="Account details">
+                <span className="profile-menu-label">Account</span>
+                <p className="profile-menu-name">{user?.name || "FlowForge user"}</p>
+                <p className="profile-menu-email">{user?.email || email || "Email unavailable"}</p>
+                <button type="button" className="profile-menu-logout" onClick={logout}>↪ Log out</button>
+              </div>
+            )}
+            <button
+              type="button"
+              className="profile"
+              onClick={() => setProfileMenuOpen((open) => !open)}
+              aria-expanded={profileMenuOpen}
+              aria-label="Show account details"
+            >
+              <span className="avatar">{(user?.name || user?.email || "U").charAt(0).toUpperCase()}</span>
+              <span className="profile-text"><strong>{user?.name || "Your workspace"}</strong><span>{user?.email || email || "Signed in"}</span></span>
+              <span className="logout-button" aria-hidden="true">⌄</span>
+            </button>
           </div>
         </div>
       </aside>
@@ -578,7 +612,12 @@ function App() {
           <div><span className="breadcrumb">Workspace / </span><strong>{activeView}</strong></div>
           <div className="topbar-right">
             <span className="live-chip"><span className="status-dot online" />Workspace active</span>
-            <button className="avatar top-avatar" title={user?.name || "Profile"}>{(user?.name || user?.email || "U").charAt(0).toUpperCase()}</button>
+            <button className="avatar top-avatar" type="button" title={user?.name || "Profile"} aria-label="Show account details" aria-expanded={topProfileMenuOpen} onClick={() => setTopProfileMenuOpen((open) => !open)}>{(user?.name || user?.email || "U").charAt(0).toUpperCase()}</button>
+            {topProfileMenuOpen && (
+              <div className="top-profile-menu" role="status" aria-label="Account name">
+                <p className="profile-menu-name">{user?.name || "FlowForge user"}</p>
+              </div>
+            )}
           </div>
         </header>
 
